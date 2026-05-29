@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cc-switch 完整使用指引</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-color: #334155;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --sidebar-width: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: #ffffff;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #6366f1);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        .header p { font-size: 1.2rem; opacity: 0.95; }
+
+        .version-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .version-info span {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--light-color);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar ul { list-style: none; }
+        .sidebar li { margin: 0.25rem 0; }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: rgba(37, 99, 235, 0.08);
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .sidebar .section-title {
+            padding: 1.5rem 1.5rem 0.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2.5rem 3rem;
+            max-width: calc(100% - var(--sidebar-width));
+        }
+
+        .content-section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .content-section h2 {
+            color: var(--dark-color);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .content-section h3 {
+            color: var(--dark-color);
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            padding-left: 0.75rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .content-section h4 {
+            color: var(--dark-color);
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.75rem;
+            font-weight: 600;
+        }
+
+        .content-section p {
+            margin-bottom: 1rem;
+        }
+
+     .content-section ul, .content-section ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        .content-section li {
+            margin: 0.4rem 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(99, 102, 241, 0.05));
+            border-left: 4px solid var(--primary-color);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.08);
+            border-left: 4px solid var(--warning-color);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .success-box {
+            background: rgba(16, 185, 129, 0.08);
+            border-left: 4px solid var(--success-color);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            color: var(--code-text);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+            box-shadow: 18px 0 0 #ffbd2e, 36px 0 0 #27c93f;
+        }
+
+        .code-block pre {
+            margin-top: 1.5rem;
+        }
+
+        code {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Monaco', monospace;
+            font-size: 0.875em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        th, td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+
+        tbody tr:hover {
+            background: rgba(37, 99, 235, 0.03);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-weight: 500;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+       }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin: 2rem 0;
+        }
+
+        .quick-link-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-link-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.12);
+            border-color: var(--primary-color);
+        }
+
+        .quick-link-card i {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.85rem;
+        }
+
+        .quick-link-card h4 {
+            margin-bottom: 0.4rem;
+            color: var(--dark-color);
+        }
+
+        .quick-link-card p {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-item {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-item h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { max-width: 100%; padding: 1.5rem; }
+            .header h1 { font-size: 2rem; }
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s;
+            display: none;
+            font-size: 1.2rem;
+        }
+
+        .scroll-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        .scroll-to-top.show { display: block; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><i class="fas fa-cloud"></i> cc-switch 完整使用指引</h1>
+        <p>强大的多云环境配置管理工具</p>
+        <div class="version-info">
+            <span><i class="fas fa-code-branch"></i> 版本: 1.0.0</span>
+            <span><i class="fas fa-calendar"></i> 更新: 2026-05-29</span>
+            <span><i class="fas fa-user"></i> Cloud Team</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar">
+            <div class="section-title">目录导航</div>
+            <ul>
+                <li><a href="#overview"><i class="fas fa-info-circle"></i> 项目概述</a></li>
+                <li><a href="#architecture"><i class="fas fa-sitemap"></i> 系统架构</a></li>
+                <li><a href="#installation"><i class="fas fa-download"></i> 安装指南</a></li>
+                <li><a href="#quickstart"><i class="fas fa-rocket"></i> 快速开始</a></li>
+                <li><a href="#basics"><i class="fas fa-cogs"></i> 基础功能</a></li>
+                <li><a href="#config-mgmt"><i class="fas fa-sliders-h"></i> 配置管理</a></li>
+                <li><a href="#providers"><i class="fas fa-cloud"></i> 云服务商配置</a></li>
+                <li><a href="#advanced"><i class="fas fa-cog"></i> 高级功能</a></li>
+                <li><a href="#security"><i class="fas fa-shield-alt"></i> 安全管理</a></li>
+                <li><a href="#troubleshooting"><i class="fas fa-tools"></i> 故障排查</a></li>
+                <li><a href="#best-practices"><i class="fas fa-star"></i> 最佳实践</a></li>
+                <li><a href="#faq"><i class="fas fa-question-circle"></i> 常见问题</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="quick-links">
+                <a class="quick-link-card" href="#quickstart">
+                    <i class="fas fa-rocket"></i>
+                    <h4>快速入门</h4>
+                    <p>5分钟掌握基本使用</p>
+                </a>
+                <a class="quick-link-card" href="#basics">
+                    <i class="fas fa-cogs"></i>
+                    <h4>基础功能</h4>
+                    <p>配置管理与切换</p>
+                </a>
+                <a class="quick-link-card" href="#providers">
+                    <i class="fas fa-cloud"></i>
+                    <h4>云服务商</h4>
+                    <p>AWS、Azure、GCP</p>
+                </a>
+                <a class="quick-link-card" href="#advanced">
+                    <i class="fas fa-cog"></i>
+                    <h4>高级功能</h4>
+                    <p>配置组、钩子、同步</p>
+                </a>
+            </div>
+
+            <!-- 项目概述 -->
+            <section id="overview" class="content-section">
+                <h2><i class="fas fa-info-circle"></i> 1. 项目概述</h2>
+
+    <h3>1.1 什么是 cc-switch</h3>
+                <p><strong>cc-switch</strong> (Cloud Configuration Switcher) 是一个强大的命令行工具，专为管理多云环境配置而设计。它允许开发者和运维人员在不同的云服务提供商配置之间快速切换，极大地简化了多云架构的管理复杂度。</p>
+
+                <div class="highlight-box">
+                    <h4>核心价值</h4>
+                    <p>在现代云计算环境中，企业和开发团队往往需要在多个云服务商（AWS、Azure、GCP 等）之间进行操作。cc-switch 帮助解决：</p>
+                    <ul>
+                        <li><strong>配置管理复杂</strong>: 不同云服务商的配置文件格式、存储位置各不相同</li>
+                        <li><strong>环境切换繁琐</strong>: 手动切换开发、测试、生产环境容易出错</li>
+                        <li><strong>凭证安全风险</strong>: 多账号管理增加了凭证泄露的风险</li>
+                        <li><strong>团队协作困难</strong>:�队成员可能使用不同的配置，导致环境不一致</li>
+                    </ul>
+                </div>
+
+                <h3>1.2 主要功能</h3>
+                <h4>多云配置管理</h4>
+                <table>
+                    <thead>
+                        <tr><th>云服务商</th><th>支持版本</th><th>配置类型</th><th>特殊功能</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>AWS</td><td>全版本</td><td>Credentials, Config, CLI</td><td>IAM Role 切换, MFA 支持</td></tr>
+                        <tr><td>Azure</td><td>全版本</td><td>Service Principal, CLI</td><td>Tenant 管理, Subscription 切换</td></tr>
+                        <tr><td>GCP</td><td>全版本</td><td>Service Account, gcloud config</td><td>Project 切换, 区域管理</td></tr>
+                        <tr><td>Alibaba Cloud</td><td>全版本</td><td>AccessKey, RAM Role</td><td>资源组管理</td></tr>
+                        <tr><td>Tencent Cloud</td><td>全版本</td><td>SecretId/Key, CAM</td><td>账号体系集成</td></tr>
+                        <tr><td>Custom</td><td>可扩展</td><td>自定义配置</td><td>插件系统支持</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4><i class="fas fa-layer-group"></i> 环境管理</h4>
+                        <p>支持多环境（dev/staging/prod），一键切换，环境隔离，配置继承</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i class="fas fa-key"></i> 凭证管理</h4>
+                        <p>系统密钥链加密存储，自动刷新，细粒度权限控制，完整审计日志</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i class="fas fa-rocket"></i> CI/CD 集成</h4>
+                        <p>Pipeline 友好，环境变量自动注入，无交互模式，Docker 支持</p>
+                    </div>
+                </div>
+
+                <h3>1.3 适用场景</h3>
+                <h4>场景一：开发团队的多环境管理</h4>
+                <p><strong>背景</strong>: 团队需在 AWS 的 dev/staging/prod 环境间频繁切换。</p>
+                <div class="code-block"><pre># 添加三个环境的配置
+cc-switch add aws --profile dev --account 123456789012
+cc-switch add aws --profile staging --account 234567890123
+cc-switch add aws --profile prod --account 345678901234
+
+# 快速切换
+cc-switch use aws-dev
+cc-switch use aws-staging
+cc-switch use aws-prod</pre></div>
+
+                <h4>场景二：多云架构管理</h4>
+                <div class="code-block"><pre># 添加多云配置
+cc-switch add aws --profile compute
+cc-switch add azure --profile database
+cc-switch add gcp --profile ml
+
+# 同时激活多个云配置
+cc-switch use-group full-stack</pre></div>
+
+                <h4>场景三：CI/CD 自动化</h4>
+                <div class="code-block"><pre># GitLab CI 配置示例
+deploy:
+  stage: deploy
+  script:
+    - cc-switch use aws-${CI_ENVIRONMENT_NAME} --non-interactive
+    - ./deploy.sh</pre></div>
+            </section>
+
+            <!-- 系统架构 -->
+            <section id="architecture" class="content-section">
+                <h2><i class="fas fa-sitemap"></i> 2. 系统架构</h2>
+                <h3>2.1 整体架构</h3>
+                <p>cc-switch 采用分层设计，每一层都有明确的职责边界：</p>
+                <div class="code-block"><pre>┌─────────────────────────────────────────┐
+│       CLI Interface Layer               │
+│   (commander.js + inquirer.js)          │
+└─────────────┬───────────────────────────┘
+              │
+┌─────────────▼───────────────────────────┐
+│       Configuration Manager             │
+│   (YAML Parser + File System)           │
+└─────────────┬───────────────────────────┘
+              │
+┌─────────────▼───────────────────────────┐
+│       Provider Abstraction Layer        │
+│   (AWS/Azure/GCP/Custom Providers)      │
+└─────────────┬───────────────────────────┘
+              │
+┌─────────────▼───────────────────────────┐
+│       Security Layer                    │
+│   (keytar + encryption)                 │
+└─────────────────────────────────────────┘</pre></div>
+
+                <h3>2.2 配置文件结构</h3>
+                <p>主配置文件位置: <code>~/.cc-switch/config.yaml</code></p>
+                <div class="code-block"><pre>~/.cc-switch/
+├── config.yaml           # 主配置文件
+├── credentials.enc       # 加密的凭证库
+├── profiles/             # 配置文件目录
+│   ├── aws-dev.yaml
+│   ├── aws-prod.yaml
+│   └── azure-prod.yaml
+├── cache/                # 缓存目录
+├── logs/                 # 日志目录
+│   ├── cc-switch.log
+│   └── audit.log
+├── backups/              # 备份目录
+└── plugins/              # 插件目录</pre></div>
+
+                <h3>2.3 安全架构</h3>
+                <div class="highlight-box">
+                    <p>凭证采用双层加密存储：</p>
+                    <ol>
+                        <li><strong>系统密钥链加密</strong>: 使用操作系统提供的密钥链服务（Keychain/Keyring）</li>
+                        <li><strong>应用层加密</strong>: AES-256-GCM 算法二次加密</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- 安装指南 -->
+            <section id="installation" class="content-section">
+                <h2><i class="fas fa-download"></i> 3. 安装指南</h2>
+
+                <h3>3.1 系统要求</h3>
+                <h4>操作系统支持</h4>
+                <table>
+                    <thead>
+                        <tr><th>操作系统</th><th>最低版本</th><th>推荐版本</th><th>备注</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>macOS</td><td>10.15 (Catalina)</td><td>13.0+ (Ventura)</td><td>需要 Xcode Command Line Tools</td></tr>
+                        <tr><td>Windows</td><td>Windows 10</td><td>Windows 11</td><td>需要 PowerShell 5.1+</td></tr>
+                        <tr><td>Linux</td><td>Ubuntu 18.04</td><td>Ubuntu 22.04</td><td>需要 build-essential</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>软件依赖</h4>
+                <ul>
+                    <li><strong>必需</strong>: Node.js v16.0.0+, npm v7.0.0+, Git v2.0.0+</li>
+             <li><strong>可选</strong>: Python 3.8+ (脚本和插件), Docker (容器化部署)</li>
+                </ul>
+
+                <h3>3.2 安装方式</h3>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'npm-install')">npm 安装（推荐）</div>
+                    <div class="tab" onclick="switchTab(event, 'source-install')">源码安装</div>
+                    <div class="tab" onclick="switchTab(event, 'docker-install')">Docker 安装</div>
+                    <div class="tab" onclick="switchTab(event, 'binary-install')">二进制安装</div>
+                </div>
+
+                <div id="npm-install" class="tab-content active">
+                    <div class="code-block"><pre># 全局安装
+npm install -g cc-switch
+
+# 验证安装
+cc-switch --version
+# 输出: cc-switch v1.0.0
+
+# 安装特定版本
+npm install -g cc-switch@1.0.0</pre></div>
+                </div>
+
+                <div id="source-install" class="tab-content">
+                    <div class="code-block"><pre># 克隆仓库
+git clone https://github.com/cloudteam/cc-switch.git
+cd cc-switch
+
+# 安装依赖
+npm install
+
+# 构建项目
+npm run build
+
+# 全局链接
+npm link</pre></div>
+                </div>
+
+                <div id="docker-install" class="tab-content">
+                    <div class="code-block"><pre># 拉取镜像
+docker pull cloudteam/cc-switch:latest
+
+# 运行容器
+docker run -it --rm \
+  -v ~/.cc-switch:/root/.cc-switch \
+  -v ~/.aws:/root/.aws \
+  cloudteam/cc-switch:latest \
+  cc-switch list
+
+# 创建别名以方便使用
+alias cc-switch='docker run -it --rm \
+  -v ~/.cc-switch:/root/.cc-switch \
+  cloudteam/cc-switch:latest cc-switch'</pre></div>
+                </div>
+
+                <div id="binary-install" class="tab-content">
+                    <div class="code-block"><pre># macOS/Linux
+curl -L https://github.com/cloudteam/cc-switch/releases/latest/download/cc-switch-$(uname -s)-$(uname -m) -o /usr/local/bin/cc-switch
+chmod +x /usr/local/bin/cc-switch
+
+# Windows (PowerShell)
+Invoke-WebRequest -Uri "https://github.com/cloudteam/cc-switch/releases/latest/download/cc-switch-win-amd64.exe" -OutFile "cc-switch.exe"</pre></div>
+                </div>
+
+                <h3>3.3 初始化配置</h3>
+                <p>安装完成后，需进行初始化：</p>
+                <div class="code-block"><pre>cc-switch init</pre></div>
+                <p>初始化向导：</p>
+                <div class="code-block"><pre>? Choose your default cloud provider:
+  ❯ AWS
+    Azure
+    GCP
+    Alibaba Cloud
+    Tencent Cloud
+
+? Enter your master password for encryption: ********
+? Confirm master password: ********
+
+? Choose cache strategy:
+  ❯ In-memory (faster, lost on restart)
+    File-based (persistent, slower)
+
+? Enable auto-backup? (Y/n): Y
+? Configure shell integration? (Y/n): Y</pre></div>
+
+                <h3>3.4 环境变量配置</h3>
+                <div class="code-block"><pre># 主密码（不推荐在生产环境使用）
+export CC_SWITCH_MASTER_PASSWORD="your-password"
+
+# 配置目录
+export CC_SWITCH_CONFIG_DIR="/custom/path/.cc-switch"
+
+# 日志级别
+export CC_SWITCH_LOG_LEVEL="debug"
+
+# 代理配置
+export CC_SWITCH_PROXY="http://proxy.example.com:8080"</pre></div>
+            </section>
+
+            <!-- 快速开始 -->
+            <section id="quickstart" class="content-section">
+                <h2><i class="fas fa-rocket"></i> 4. 快速开始</h2>
+
+                <h3>4.1 五分钟入门教程</h3>
+                <div class="success-box">
+                    <p>本教程将帮助您在五分钟内掌握 cc-switch 的基本使用。</p>
+                </div>
+
+                <h4>步骤 1: 初始化配置</h4>
+                <div class="code-block"><pre>cc-switch init</pre></div>
+
+                <h4>步骤 2: 添加云配置</h4>
+                <div class="code-block"><pre>cc-switch add aws
+
+? Configuration name: aws-dev
+? AWS Access Key ID: AKIAIOSFODNN7EXAMPLE
+? AWS Secret Access Key: ********************************
+? Default region: us-east-1
+? Output format: json
+
+✓ Configuration "aws-dev" added successfully!</pre></div>
+
+                <h4>步骤 3: 查看配置列表</h4>
+                <div class="code-block"><pre>cc-switch list
+
+┌─────────────┬──────────┬─────────────┬────────────┐
+│ Name        │ Provider │ Account     │ Region     │
+├─────────────┼──────────┼─────────────┼────────────┤
+│ aws-dev *   │ AWS      │ 12345678901 │ us-east-1  │
+└─────────────┴──────────┴─────────────┴────────────┘
+* = active configuration</pre></div>
+
+                <h4>步骤 4: 切换配置</h4>
+                <div class="code-block"><pre>cc-switch use aws-dev
+
+✓ Switched to "aws-dev"
+  AWS credentials updated
+  Environment variables set
+  Ready to use!</pre></div>
+
+                <h4>步骤 5: 验证配置</h4>
+                <div class="code-block"><pre>aws sts get-caller-identity
+
+{
+  "UserId": "AIDAI23456789012345678",
+  "Account": "123456789012",
+  "Arn": "arn:aws:iam::123456789012:user/dev-user"
+}</pre></div>
+
+                <h3>4.2 命令概览</h3>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'basic-cmd')">基础命令</div>
+                    <div class="tab" onclick="switchTab(event, 'advanced-cmd')">高级命令</div>
+                    <div class="tab" onclick="switchTab(event, 'mgmt-cmd')">管理命令</div>
+                </div>
+
+                <div id="basic-cmd" class="tab-content active">
+                    <table>
+                        <thead><tr><th>命令</th><th>描述</th><th>示例</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>init</code></td><td>初始化配置</td><td><code>cc-switch init</code></td></tr>
+                            <tr><td><code>add</code></td><td>添加配置</td><td><code>cc-switch add aws</code></td></tr>
+                            <tr><td><code>list</code></td><td>列出配置</td><td><code>cc-switch list</code></td></tr>
+                            <tr><td><code>use</code></td><td>切换配置</td><td><code>cc-switch use aws-dev</code></td></tr>
+                            <tr><td><code>remove</code></td><td>删除配置</td><td><code>cc-switch remove aws-dev</code></td></tr>
+                            <tr><td><code>show</code></td><td>查看详情</td><td><code>cc-switch show aws-dev</code></td></tr>
+                            <tr><td><code>edit</code></td><td>编辑配置</td><td><code>cc-switch edit aws-dev</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="advanced-cmd" class="tab-content">
+                    <table>
+                        <thead><tr><th>命令</th><th>描述</th><th>示例</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>backup</code></td><td>备份配置</td><td><code>cc-switch backup</code></td></tr>
+                            <tr><td><code>restore</code></td><td>恢复配置</td><td><code>cc-switch restore backup.tar.gz</code></td></tr>
+                            <tr><td><code>sync</code></td><td>同步配置</td><td><code>cc-switch sync</code></td></tr>
+                            <tr><td><code>export</code></td><td>导出配置</td><td><code>cc-switch export --format json</code></td></tr>
+                            <tr><td><code>import</code></td><td>导入配置</td><td><code>cc-switch import config.json</code></td></tr>
+                            <tr><td><code>validate</code></td><td>验证配置</td><td><code>cc-switch validate aws-dev</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="mgmt-cmd" class="tab-content">
+                    <table>
+                        <thead><tr><th>命令</th><th>描述</th><th>示例</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>config</code></td><td>管理设置</td><td><code>cc-switch config set cache true</code></td></tr>
+                            <tr><td><code>update</code></td><td>更新工具</td><td><code>cc-switch update</code></td></tr>
+                            <tr><td><code>doctor</code></td><td>诊断问题</td><td><code>cc-switch doctor</code></td></tr>
+                            <tr><td><code>completion</code></td><td>生成补全</td><td><code>cc-switch completion bash</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTIONS_PLACEHOLDER -->
+        </main>
+    </div>
+
+    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        function switchTab(event, tabId) {
+            const tabs = event.target.parentElement.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            const container = event.target.closest('.content-section') || document;
+            const contents = container.querySelectorAll('.tab-content');
+            contents.forEach(c => {
+                if (c.id === tabId) c.classList.add('active');
+                else c.classList.remove('active');
+            });
+        }
+
+        window.addEventListener('scroll', () => {
+            const btn = document.querySelector('.scroll-to-top');
+            if (window.scrollY > 400) btn.classList.add('show');
+            else btn.classList.remove('show');
+        });
+
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
