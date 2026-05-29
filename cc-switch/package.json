@@ -1,0 +1,40 @@
+  "name": "cc-switch",
+  "version": "1.0.0",
+  "description": "Cloud Configuration Switcher - Manage and switch between cloud provider configurations",
+  "main": "index.js",
+  "bin": {
+    "cc-switch": "./bin/cc-switch.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest",
+    "build": "webpack",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "cloud",
+    "configuration",
+    "aws",
+    "azure",
+    "gcp",
+    "cli",
+    "switcher"
+  ],
+  "author": "Cloud Team",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^9.0.0",
+    "inquirer": "^8.2.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "yaml": "^2.1.0",
+    "keytar": "^7.9.0",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "jest": "^28.1.0",
+    "nodemon": "^2.0.16",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2"
+  }
+}

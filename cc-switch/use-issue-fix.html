@@ -1,0 +1,211 @@
+```html
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>问题总结</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'PingFang SC', 'Helvetica Neue', sans-serif;
+    background: #0f0f0f;
+    color: #e0e0e0;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+  .card {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 1px solid #2a2a2a;
+    overflow: hidden;
+  }
+  .card-header {
+    background: #111;
+    padding: 20px 28px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card-header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f0f0f0;
+  }
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #2a2a2a;
+    color: #888;
+  }
+  .section {
+    padding: 24px 28px;
+    border-bottom: 1px solid #1f1f1f;
+  }
+  .section:last-child { border-bottom: none; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 12px;
+  }
+  .problem-block {
+    background: #1f1313;
+    border: 1px solid #3a2020;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .error-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #3a1818;
+    color: #e05050;
+    font-family: monospace;
+    margin-bottom: 10px;
+  }
+  .problem-block p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #bbb;
+  }
+  .root-cause {
+    background: #141820;
+    border: 1px solid #1e2840;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .root-cause p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #bbb;
+  }
+  .solution-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    background: #1e3a2a;
+    color: #4caf82;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin-bottom: 4px;
+  }
+  .step-desc {
+    font-size: 13px;
+    color: #888;
+    line-height: 1.6;
+  }
+  code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    background: #252525;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #7ec8a0;
+  }
+  .result-block {
+    background: #131a14;
+    border: 1px solid #1e3a22;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .result-icon { font-size: 20px; }
+  .result-text { font-size: 14px; color: #aaa; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <span>🔧</span>
+    <h1>Claude Desktop × DeepSeek 问题总结</h1>
+    <span class="badge">2026-05-29</span>
+  </div>
+
+  <div class="section">
+    <div class="section-label">遇到的问题</div>
+    <div class="problem-block">
+      <div class="error-tag">API Error: 400</div>
+      <p>在 Claude Desktop 中通过 cc-switch 接入 DeepSeek 模型执行任务时，每当对话涉及工具调用（MCP 工具、文件读写等 Agent 操作），就会报错：<br><br>
+      <code>The `content[].thinking` in the thinking mode must be passed back to the API.</code>
+      </p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">根本原因</div>
+    <div class="root-cause">
+      <p>cc-switch 默认使用 <strong>Anthropic 原生接口</strong>（<code>https://api.deepseek.com/anthropic</code>）。Claude Code 在多轮对话中要求把上一轮的 <code>content[].thinking</code> 块完整回传，而 DeepSeek 使用的是 <code>reasoning_content</code> 字段，两套协议不兼容。一旦触发工具调用，thinking block 无法正确透传，API 即报 400 错误。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">最终解决方案</div>
+    <div class="solution-steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">修改请求地址</div>
+          <div class="step-desc">
+            在 cc-switch 供应商编辑页面，将请求地址从<br>
+            <code>https://api.deepseek.com/anthropic</code><br>
+            改为<br>
+            <code>https://api.deepseek.com/v1</code>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">切换 API 格式</div>
+          <div class="step-desc">
+            将 API 格式从 <code>Anthropic Messages（原生）</code> 改为 <code>OpenAI Chat Completions（需开启路由）</code>，通过 cc-switch 路由层做协议转换，彻底绕开 thinking block 回传机制。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">结果</div>
+    <div class="result-block">
+      <div class="result-icon">✅</div>
+      <div class="result-text">切换为 OpenAI 兼容接口后，工具调用正常执行，不再触发 400 错误，Claude Desktop + DeepSeek Agent 任务恢复正常。</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+```
